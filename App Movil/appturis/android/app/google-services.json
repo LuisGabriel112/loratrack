@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "282215263913",
+    "project_id": "authenticationapp-50ae9",
+    "storage_bucket": "authenticationapp-50ae9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282215263913:android:f1c026bba3a0b4c50183b8",
+        "android_client_info": {
+          "package_name": "com.example.appturis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "282215263913-hjrd33ose6u798fr80oitpg1bb6g2e91.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMWWoCbP3wv-99vI0dTRIpSFoQsvLN30s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "282215263913-hjrd33ose6u798fr80oitpg1bb6g2e91.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "282215263913-k5vp87548jeh93hm7f3967ma1f14h0sp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.turis"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
