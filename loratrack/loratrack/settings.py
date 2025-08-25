@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'lorafi',
-    "django_browser_reload",
-
 ]
 
 MIDDLEWARE = [
@@ -52,8 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
-
 ]
 
 ROOT_URLCONF = 'loratrack.urls'
@@ -83,6 +79,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+
+        'ENGINE': 'djongo',
+        'NAME': 'lorafi',
+        'HOST': 'localhost',
+        'PORT': 27017,
+        'USER': 'admin',
+        'PASSWORD': 'admin'
     }
 }
 

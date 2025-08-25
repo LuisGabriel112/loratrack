@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Dispositivos</title>
+</head>
+<body>
+    <h1>Mis Dispositivos</h1>
+
+    {% if dispositivos %}
+        <ul>
+        {% for dispositivo in dispositivos %}
+            <li>
+                <strong>Nombre:</strong> {{ dispositivo.nombre }} <br>
+                <strong>Marca:</strong> {{ dispositivo.marca }} <br>
+                <strong>Descripción:</strong> {{ dispositivo.descripcion }} <br>
+                </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay dispositivos registrados.</p>
+    {% endif %}
+
+</body>
+</html>
