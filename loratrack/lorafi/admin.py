@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import nodo, usuario, dispositivos;
+from .models import dispositivos
+from .models import nodo
 # Register your models here.
-admin.site.register(nodo)
-admin.site.register(usuario)
 admin.site.register(dispositivos)
+admin.site.register(nodo)

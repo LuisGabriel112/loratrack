@@ -28,49 +28,62 @@
         <p class="text-lg font-regular text-white z-5 mt-5 font-mono text-center ">Monitoreo de dispositivos con cobertura amplia mediante LoRaWAN, bajo consumo energético y precisión optimizada.</p>
       </div>
       <!-- contenido principal (titulo, inputs) -->
-<div class="flex flex-col items-center z-5 w-180 h-130 pt-8">
-  <!-- titulo centrado y arriba -->
-  <h1 class="text-4xl font-bold text-white mb-26 mt-10 text-center">Inicia sesion en LORAFI</h1>
-  <div class="relative w-140 mb-4">
-    <input
-      type="text"
-      name="usuario"
-      id="usuario"
-      placeholder=""
-      class="peer text-gray-300 z-5 focus:text-white bg-transparent border-b-2 border-gray-500 w-full h-10 focus:outline-none"
-    />
-    <label
-      for="usuario"
-      class="absolute left-0 top-2 text-gray-400 transition-all duration-300 pointer-events-none
-        peer-focus:-top-4 peer-focus:text-xs peer-focus:text-gray-300
-        peer-placeholder-shown:top-2 peer-placeholder-shown:text-base"
-    >
-      Tu nombre de usuario
-    </label>
-  </div>
-  <div class="relative w-140 mt-20">
-    <input
-      type="password"
-      name="contrasena"
-      id="contrasena"
-      placeholder=""
-      class="peer text-gray-300 z-5 focus:text-white bg-transparent border-b-2 border-gray-500 w-full h-10 focus:outline-none"
-    />
-    <label
-      for="contrasena"
-      class="absolute left-0 top-2 text-gray-400 transition-all duration-300 pointer-events-none
-        peer-focus:-top-4 peer-focus:text-xs peer-focus:text-gray-300
-        peer-placeholder-shown:top-2 peer-placeholder-shown:text-base"
-    >
-      Tu contraseña
-    </label>
-  </div>
-  <button
-    type="submit"
-    class="w-140 h-10 bg-[#0D6EFF] text-white font-bold rounded-lg shadow-md transition-all duration-200 hover:bg-[#0056b3] hover:scale-105 focus:outline-none mt-10"
-  >
-    Aceptar
-  </button>
-</div>
+        <form method="post" action="{% url 'inicio' %}" class="flex flex-col items-center z-5 w-180 h-130 pt-8">
+            {% csrf_token %}
+          <!-- titulo centrado y arriba -->
+          <h1 class="text-4xl font-bold text-white mb-10 mt-10 text-center">Inicia sesion en LORAFI</h1>
+            
+            {% if messages %}
+                <div class="w-140 mb-4">
+                    {% for message in messages %}
+                        <div class="bg-red-500 text-white text-center p-2 rounded-lg">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        
+          <div class="relative w-140 mb-4">
+            <input
+              type="text"
+              name="usuario"
+              id="usuario"
+              placeholder=""
+              class="peer text-gray-300 z-5 focus:text-white bg-transparent border-b-2 border-gray-500 w-full h-10 focus:outline-none"
+            />
+            <label
+              for="usuario"
+              class="absolute left-0 top-2 text-gray-400 transition-all duration-300 pointer-events-none
+                peer-focus:-top-4 peer-focus:text-xs peer-focus:text-gray-300
+                peer-placeholder-shown:top-2 peer-placeholder-shown:text-base"
+            >
+              Tu nombre de usuario
+            </label>
+          </div>
+          <div class="relative w-140 mt-10">
+            <input
+              type="password"
+              name="contrasena"
+              id="contrasena"
+              placeholder=""
+              class="peer text-gray-300 z-5 focus:text-white bg-transparent border-b-2 border-gray-500 w-full h-10 focus:outline-none"
+            />
+            <label
+              for="contrasena"
+              class="absolute left-0 top-2 text-gray-400 transition-all duration-300 pointer-events-none
+                peer-focus:-top-4 peer-focus:text-xs peer-focus:text-gray-300
+                peer-placeholder-shown:top-2 peer-placeholder-shown:text-base"
+            >
+              Tu contraseña
+            </label>
+          </div>
+          <button
+            type="submit"
+            class="w-140 h-10 bg-[#0D6EFF] text-white font-bold rounded-lg shadow-md transition-all duration-200 hover:bg-[#0056b3] hover:scale-105 focus:outline-none mt-10"
+          >
+            Aceptar
+          </button>
+        </form>
+    </div>
   </body>
 </html>
