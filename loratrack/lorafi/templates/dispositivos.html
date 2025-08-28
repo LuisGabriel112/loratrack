@@ -1,25 +1,46 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Lista de Dispositivos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LORAFI - Mis Dispositivos</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+      rel="stylesheet"
+    />
 </head>
-<body>
-    <h1>Mis Dispositivos</h1>
+<body class="bg-gray-900 text-gray-200" style="font-family: 'Instrument Sans', sans-serif;">
 
-    {% if dispositivos %}
-        <ul>
-        {% for dispositivo in dispositivos %}
-            <li>
-                <strong>Nombre:</strong> {{ dispositivo.nombre }} <br>
-                <strong>Marca:</strong> {{ dispositivo.marca }} <br>
-                <strong>Descripción:</strong> {{ dispositivo.descripcion }} <br>
-                </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No hay dispositivos registrados.</p>
-    {% endif %}
+    <h1 class="text-5xl font-bold text-center py-8" style="letter-spacing: 0.1em;">
+        Mis Dispositivos
+    </h1>
+
+    <div class="container mx-auto px-4 max-w-7xl">
+        {% if dispositivos %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for dispositivo in dispositivos %}
+                    <div class="bg-gray-800 rounded-lg shadow-xl p-6 flex flex-col hover:shadow-2xl hover:border-gray-600 border border-transparent transition-all duration-300">
+                        <h2 class="text-2xl font-bold mb-2 text-teal-300">{{ dispositivo.nombre }}</h2>
+                        <p class="text-lg mb-4 text-gray-400">{{ dispositivo.marca }}</p>
+                        <p class="text-gray-300 flex-grow">{{ dispositivo.descripcion }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-16">
+                <p class="text-2xl text-gray-400">No hay dispositivos registrados.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="text-center mt-16 mb-8">
+        <a href="/pantalla_principal/" class="bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white font-semibold py-3 px-5 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out transform hover:scale-105">
+            &larr; Volver al Mapa
+        </a>
+    </div>
 
 </body>
 </html>
