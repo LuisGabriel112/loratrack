@@ -1,44 +1,41 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Dispositivos</title>
-    <style>
-        /* Opcional: Asegura que el mapa ocupe un espacio definido */
-        #map_container {
-            width: 90%;
-            height: 80vh; /* 80% de la altura de la pantalla */
-            margin: auto;
-            margin-top: 20px;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <h1 style="text-align: center;">Mapa de Dispositivos (Ejemplo)</h1>
+{% extends 'base.html' %}
+{% load static %}
 
-    <div id="map_container">
+{% block title %}Mapa LoraTrack{% endblock %}
+
+{% block content %}
+<div class="flex">
+
+    <!-- Incluimos la barra lateral -->
+    {% include 'aside_bar.html' %}
+
+    <!-- Contenedor principal del mapa con margen para la barra lateral -->
+    <!-- Añadida animación de zoom y un alto de pantalla completa -->
+    <div class="flex-grow ml-28 h-screen animate__animated animate__zoomIn">
         {{ mapa_html|safe }}
     </div>
 
-    <div class="flex flex-col space-y-4" style="position: absolute; top: 120px; right: 6%; z-index: 1000;">
-        <a href="/nodos/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full text-center">Ver Nodos</a>
-        <a href="/dispositivos/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full text-center">Ver Dispositivos</a>
-        <a href="/admin/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full text-center">Ver Admin</a>
+    <div class="z-50 w-10 h-10 rounded-full bg-[#0D6EFF] absolute top-10 left-44 flex justify-center items-center shadow-lg hover:bg-blue-800 hover:shadow-xl hover:scale-110 transition-all duration-300 cursor-pointer nav_dis">
+        <img src="{% static 'img/nav_dis.png' %}" alt="Navegación de dispositivos">
     </div>
-</body>
-</html>
+
+    <!-- lista de dispositivos (oculta por defecto) -->
+    <div class="z-50 w-110 h-100 cursor-pointer absolute bg-white shadow-lg rounded-lg p-4 top-20 left-44 nav_dis_content hide">
+        <button class="volver-btn w-20 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 hover:scale-105 transition-all duration-200 mb-2">Volver</button>
+        <ul class="space-y-2">
+            {% for dispositivo in dispositivos %}
+                <li class="p-2 hover:bg-gray-100 rounded">
+                    <p class="text-blue-600 hover:underline">{{ dispositivo.nombre }}</p>
+                </li>
+            {% empty %}
+                <li class="text-gray-500">No hay dispositivos disponibles.</li>
+            {% endfor %}
+        </ul>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_content_js %}
+<script src="{% static 'js/pantalla_principal.js' %}"></script>
+{% endblock %}

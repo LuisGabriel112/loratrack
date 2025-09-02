@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login # Para manejar la autenticac
 from django.contrib import messages # Para mostrar mensajes flash al usuario.
 from .models import * # Importo todos mis modelos de la app.
 import folium # La estrella del show para los mapas.
-
+from django.contrib.auth import logout # Para cerrar sesión del usuario.
 
 # Esta vista es para mostrar la lista de todos mis dispositivos.
 def vista_dispositivos(request):
@@ -44,6 +44,13 @@ def inicio(request):
     # Si no es una petición POST (o si falló el login), simplemente muestro la página de inicio.
     return render(request, 'index.html')
 
+# Vista para cerrar la sesión del usuario.
+def logout_view(request):
+    # La función logout de Django se encarga de limpiar la sesión.
+    logout(request)
+    # Redirijo al usuario a la página de inicio de sesión.
+    return redirect('inicio')
+
 # La vista principal de mi aplicación, donde muestro el mapa.
 def pantalla_principal(request):
     # --- Para este ejemplo, estoy usando datos fijos ---
@@ -55,9 +62,34 @@ def pantalla_principal(request):
         {'nombre': 'Dispositivo 3 (Veracruz)', 'lat': 19.1700, 'lon': -96.1300},
     ]
 
-    # Creo el objeto de mapa con Folium. Lo centro usando las coordenadas del primer dispositivo.
-    # El 'zoom_start' define qué tan cerca se ve el mapa al cargarlo.
-    mapa = folium.Map(location=[dispositivos_ejemplo[0]['lat'], dispositivos_ejemplo[0]['lon']], zoom_start=13)
+    # Creo el objeto de mapa con Folium, centrado en el primer dispositivo.
+    # Añado la atribución requerida para la capa base 'cartodbdark_matter'.
+    mapa = folium.Map(
+        location=[dispositivos_ejemplo[0]['lat'], dispositivos_ejemplo[0]['lon']],
+        zoom_start=15,
+        tiles='cartodbdark_matter',
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    )
+
+    # --- Añadiendo capas de mapas para el selector con su atribución ---
+    folium.TileLayer(
+        'OpenStreetMap',
+        name='Estándar',
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    ).add_to(mapa)
+
+    folium.TileLayer(
+        tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        attr='Esri',
+        name='Satélite'
+    ).add_to(mapa)
+
+    # Capa clara de CartoDB (Positron)
+    folium.TileLayer(
+        'cartodbpositron',
+        name='Claro',
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    ).add_to(mapa)
 
     # Recorro mi lista de dispositivos de ejemplo para poner un marcador para cada uno.
     for disp in dispositivos_ejemplo:
@@ -67,14 +99,21 @@ def pantalla_principal(request):
             tooltip='Haz clic para ver más'  # El mensajito que aparece al pasar el mouse por encima.
         ).add_to(mapa) # Añado el marcador al mapa que creé antes.
 
+    # --- Añado el control de capas al mapa ---
+    folium.LayerControl().add_to(mapa)
+
     # Folium necesita que convierta el mapa a código HTML para poder mostrarlo en mi plantilla.
     mapa_html = mapa._repr_html_()
 
+    # Consulto todos los dispositivos para pasarlos a la plantilla.
+    todos_los_dispositivos = dispositivos.objects.all()
+
     # De nuevo, preparo el contexto para la plantilla.
     contexto = {
-        'mapa_html': mapa_html
+        'mapa_html': mapa_html,
+        'dispositivos': todos_los_dispositivos
     }
-    # Renderizo la plantilla de la pantalla principal y le paso el mapa en el contexto.
+    # Renderizo la plantilla de la pantalla principal y le paso el mapa y los dispositivos en el contexto.
     return render(request, 'pantalla_principal.html', contexto)
 
 # Vista para mostrar la página de nodos.
@@ -90,3 +129,9 @@ def nodos(request):
 
     # Renderizo la plantilla 'nodos.html' con la lista de nodos.
     return render(request, 'nodos.html', contexto)
+
+def aside_bar(request):
+    return render(request, 'aside_bar.html')
+
+def base(request):
+    return render(request, 'base.html')
