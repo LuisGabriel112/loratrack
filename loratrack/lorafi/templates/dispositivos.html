@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Estado de los Dispositivos{% endblock %}
+
+{% block content %}
+<div class="flex">
+
+    {% include 'aside_bar.html' %}
+
+    <div class="flex-grow ml-28 p-6">
+        <h1 class="text-5xl font-bold text-center py-8 text-gray-800 animate__animated animate__fadeInDown" style="letter-spacing: 0.1em;">
+            Mis Dispositivos
+        </h1>
+
+        <div class="container mx-auto px-4 max-w-7xl animate__animated animate__fadeInUp">
+            {% if dispositivos %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for dispositivo in dispositivos %}
+                        <div class="bg-white rounded-lg shadow-md p-6 flex flex-col border border-transparent transition-all duration-300 hover:shadow-xl hover:scale-105">
+                            <h2 class="text-2xl font-bold mb-2 text-blue-600">{{ dispositivo.nombre }}</h2>
+                            <p class="text-lg mb-4 text-gray-500">{{ dispositivo.marca }}</p>
+                            <p class="text-gray-700 flex-grow">{{ dispositivo.descripcion }}</p>
+                            <p class="text-gray-500">ID: {{ dispositivo.id}}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-16">
+                    <p class="text-2xl text-gray-500">No hay dispositivos registrados.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
