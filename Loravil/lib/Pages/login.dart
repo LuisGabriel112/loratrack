@@ -16,7 +16,7 @@ class LogIn extends StatelessWidget {
               height: 400,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/background.png'),
+                  image: AssetImage('assets/background.png'),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -31,7 +31,7 @@ class LogIn extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/images/light-1.png'),
+                            image: AssetImage('assets/light-1.png'),
                           ),
                         ),
                       ),
@@ -46,7 +46,7 @@ class LogIn extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/images/light-2.png'),
+                            image: AssetImage('assets/light-2.png'),
                           ),
                         ),
                       ),
@@ -62,7 +62,7 @@ class LogIn extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/images/clock.png'),
+                            image: AssetImage('assets/clock.png'),
                           ),
                         ),
                       ),
@@ -75,7 +75,7 @@ class LogIn extends StatelessWidget {
                         margin: EdgeInsets.only(top: 50),
                         child: Center(
                           child: Text(
-                            "Login",
+                            "LORAVIL",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 40,
@@ -125,7 +125,7 @@ class LogIn extends StatelessWidget {
                             child: TextField(
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Email or Phone number",
+                                hintText: "Usuario o EUI",
                                 hintStyle: TextStyle(color: Colors.grey[700]),
                               ),
                             ),
@@ -136,7 +136,7 @@ class LogIn extends StatelessWidget {
                               obscureText: true,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Password",
+                                hintText: "Contraseña",
                                 hintStyle: TextStyle(color: Colors.grey[700]),
                               ),
                             ),
@@ -145,7 +145,7 @@ class LogIn extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 60),
                   FadeInUp(
                     duration: Duration(milliseconds: 1900),
                     child: Container(
@@ -171,13 +171,6 @@ class LogIn extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 70),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 2000),
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(color: Color.fromRGBO(143, 148, 251, 1)),
-                    ),
-                  ),
                 ],
               ),
             ),
