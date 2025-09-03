@@ -1,45 +1,127 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Estado de los Nodos{% endblock %}
+{% block title %}Nodos{% endblock %}
 
 {% block content %}
 <div class="flex">
-    
+
     {% include 'aside_bar.html' %}
 
-    <div class="flex-grow ml-28 p-6">
-        <h1 class="text-5xl font-bold text-center py-8 text-gray-800 animate__animated animate__fadeInDown" style="letter-spacing: 0.1em;">
-            Estado de los Nodos
-        </h1>
+    <div class="flex-grow ml-28 p-8 bg-gray-50 min-h-screen">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Nodos</h1>
+            <p class="text-gray-600">En este apartado encontrarás todos los nodos registrados</p>
+        </div>
 
-        <div class="container mx-auto px-4 max-w-4xl animate__animated animate__fadeInUp">
-            <div class="bg-white rounded-lg shadow-xl overflow-hidden">
-                <ul class="divide-y divide-gray-200">
-                    {% for nodo in nodos %}
-                        <li class="p-6 hover:bg-gray-100 transition-colors duration-200">
-                            <div class="flex justify-between items-start">
-                                <h2 class="text-xl font-semibold text-blue-600">{{ nodo.nombre }}</h2>
-                                <span class="text-base font-medium px-3 py-1 rounded-full
-                                    {% if 'activo' in nodo.estado|lower %} bg-green-100 text-green-800
-                                    {% elif 'inactivo' in nodo.estado|lower %} bg-red-100 text-red-800
-                                    {% else %} bg-gray-200 text-gray-800 {% endif %}">
-                                    {{ nodo.estado }}
-                                </span>
-                            </div>
-                            <div class="mt-3 text-sm text-gray-600 space-y-1">
-                                <p><strong class="font-semibold text-gray-700">Creado:</strong> {{ nodo.fecha_creacion|date:"d/m/Y, P" }}</p>
-                                <p><strong class="font-semibold text-gray-700">Actualizado:</strong> {{ nodo.fecha_actualizacion|date:"d/m/Y, P" }}</p>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="p-6 text-center text-gray-500">
-                            No hay nodos disponibles para mostrar.
-                        </li>
-                    {% endfor %}
-                </ul>
+        <!-- Main Content Container -->
+        <div class="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+            <!-- Table Header -->
+            <div class="bg-gray-900 border-b border-gray-700 px-6 py-4">
+                <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gray-800 rounded flex items-center justify-center mr-3">
+                            <span class="material-symbols-outlined text-gray-500 text-sm"><img src="{% static 'img/nodo.png' %}" alt=""></span>
+                        </div>
+                        Nombre:
+                    </div>
+                    <div>IMEI:</div>
+                    <div>Estado:</div>
+                    <div>Batería:</div>
+                    <div>Ubicación:</div>
+                </div>
             </div>
+
+            <!-- Table Body -->
+            <div class="divide-y divide-gray-800">
+                {% for nodo in nodos %}
+                <div class="px-6 py-4 hover:bg-gray-800 transition-colors duration-200">
+                    <div class="grid grid-cols-5 gap-4 items-center">
+                        <!-- Nombre Column -->
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-{% if nodo.estado == 'activo' %}green{% else %}red{% endif %}-900 rounded flex items-center justify-center mr-3">
+                                <span class="material-symbols-outlined text-{% if nodo.estado == 'activo' %}green{% else %}red{% endif %}-300 text-sm"><img src="{% static 'img/nodo.png' %}" alt=""></span>
+                            </div>
+                            <span class="font-medium text-white">Nodo {{ nodo.nombre }}</span>
+                        </div>
+
+                        <!-- IMEI Column -->
+                        <div>
+                            <span class="text-gray-400 font-mono">{{ nodo.imei }}</span>
+                        </div>
+
+
+                        <!-- Estado Column -->
+                        <div>
+                            {% if nodo.estado == 'activo' %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                    Activo
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                                    <span class="w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+                                    Inactivo
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Batería Column -->
+                        <div class="flex items-center">
+                            {% if nodo.estado == 'activo' %}
+                                <span class="material-symbols-outlined text-green-400 mr-1 text-sm"></span>
+                                <span class="text-gray-300 font-medium">{% cycle '100' '70' '50' %}%</span>
+                            {% else %}
+                                <span class="material-symbols-outlined text-gray-500 mr-1 text-sm"></span>
+                                <span class="text-gray-400 font-medium">50%</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Ubicación Column -->
+                        <div>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors duration-200">
+                                Ubicación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="px-6 py-12 text-center">
+                    <div class="text-gray-600 mb-4">
+                        <span class="material-symbols-outlined text-6xl">device_hub</span>
+                    </div>
+                    <p class="text-xl text-gray-500 mb-2">No hay nodos registrados</p>
+                    <p class="text-gray-600">Los nodos aparecerán aquí una vez que sean añadidos al sistema.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if nodos %}
+            <div class="bg-gray-900 px-6 py-4 border-t border-gray-800">
+                <div class="flex items-center justify-center space-x-2">
+                    <span class="px-3 py-2 text-sm font-medium text-gray-400">1</span>
+                    <span class="px-3 py-2 text-sm text-gray-600">2</span>
+                    <span class="px-3 py-2 text-sm text-gray-600">3</span>
+                    <span class="px-3 py-2 text-sm text-gray-600">4</span>
+                    <span class="px-3 py-2 text-sm text-gray-600">5</span>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 
 </div>
+
+<style>
+    /* Custom styles for better visual appeal */
+    .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    }
+</style>
+
 {% endblock %}

@@ -7,6 +7,7 @@ estado_choices = [
 # Create your models here.
 class nodo (models.Model):
     id = models.AutoField(primary_key=True)
+    imei = models.CharField(max_length=15)
     nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
