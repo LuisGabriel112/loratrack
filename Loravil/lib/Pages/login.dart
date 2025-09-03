@@ -1,10 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
-void main() => runApp(const LogIn());
-
-class LogIn extends StatelessWidget {
+class LogIn extends StatefulWidget {
   const LogIn({super.key});
+  @override
+  State<LogIn> createState() => _LogInState();
+}
+
+String _getErrorMessage(e) {
+  switch (e.code) {
+    case 'user-not-found':
+      return 'No user found for that email.';
+    case 'wrong-password':
+      return 'Wrong password provided.';
+    case 'invalid-email':
+      return 'Invalid email address.';
+    case 'too-many-requests':
+      return 'Too many login attempts. Please try again later.';
+    //Add more cases as needed based on your authentication service's error codes.  For instance, you might have a specific code related to reCAPTCHA failure.
+    default:
+      return 'Correo electronico o contraseña incorrectos. Vuelve a intentar';
+  }
+}
+
+class _LogInState extends State<LogIn> {
+  String email = "", password = "";
+  TextEditingController mailController = TextEditingController();
+  TextEditingController passController = TextEditingController();
+  final _formkey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +145,15 @@ class LogIn extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            child: TextField(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor ingrese un usuario o EUI';
+                                }
+                                return null;
+                              },
+                              controller: mailController,
+                              obscureText: true,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Usuario o EUI",
@@ -132,7 +163,14 @@ class LogIn extends StatelessWidget {
                           ),
                           Container(
                             padding: EdgeInsets.all(8.0),
-                            child: TextField(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor ingrese un e-mail';
+                                }
+                                return null;
+                              },
+                              controller: passController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 border: InputBorder.none,

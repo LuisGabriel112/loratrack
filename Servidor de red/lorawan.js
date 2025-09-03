@@ -1,147 +1,59 @@
-const fastify = require('fastify')({ logger: true });
-const mqtt = require('mqtt');
-const crypto = require('crypto');
+const fastify = require('fastify')({ logger: true }); // Enable logging
+const lorawan = require('lorawan-packet'); // You might need a specific LoRaWAN library
+const crypto = require('crypto'); // For encryption/decryption
 
-// Configuración
-const mqttBroker = 'mqtt://localhost:1883';
-const fastifyPort = 3000; // Puerto en el que Fastify escuchará las solicitudes
+// Configuration
+const appEUI = 'TU_AppEUI'; // Replace with your AppEUI
+const appKey = 'TU_AppKey'; // Replace with your AppKey (VERY SENSITIVE)
 
-// Base de Datos de Dispositivos (¡Reemplaza con una base de datos real!)
-const devices = {
-    '5E9D1E0857CF25F1': { // DevEUI
-        appEUI: '5E9D1E0857CF25F1', // AppEUI
-        appKey: 'F921D50CD7D02EE3C5E6142154F274B2' // AppKey
-    }
-};
+// Define the route for receiving LoRaWAN data
+fastify.post('/lorawan/up', async (request, reply) => {
+  try {
+    // 1. Receive LoRaWAN packet from gateway (from the request body)
+    const lorawanPacket = request.body; // Assuming gateway sends JSON in the request body
 
-// Funciones Auxiliares
-function generateSessionKeys(appKey, appNonce, devNonce, netID, devAddr) {
-    // **IMPORTANTE:** Implementa el algoritmo de derivación de claves de LoRaWAN aquí
-    // (Este es un ejemplo simplificado, ¡NO USAR EN PRODUCCIÓN!)
-    const nwkSKey = crypto.randomBytes(16).toString('hex').toUpperCase();
-    const appSKey = crypto.randomBytes(16).toString('hex').toUpperCase();
-    return { nwkSKey, appSKey };
-}
+    // 2. Identify the device (DevEUI)
+    const devEUI = lorawanPacket.DevEUI; // Assuming DevEUI is included
 
-// Inicialización del Cliente MQTT
-const mqttClient = mqtt.connect(mqttBroker);
+    // 3. OTAA Process (Simplified) -  This is the core of the challenge
+    //    -  In a real OTAA, you'd need to handle Join Requests/Accepts
+    //    -  For simplicity, we'll assume the keys are pre-provisioned (NOT SECURE in production)
 
-mqttClient.on('connect', () => {
-    console.log('Conectado al broker MQTT');
+    // 4.  Derive session keys (NwkSKey, AppSKey) -  This is a critical step in OTAA
+    //    -  This example is highly simplified and NOT secure.  You need to follow the LoRaWAN specification for key derivation.
+    const nwkSKey = crypto.createHmac('sha256', appKey).update(devEUI + 'nwk').digest('hex');
+    const appSKey = crypto.createHmac('sha256', appKey).update(devEUI + 'app').digest('hex');
+
+    // 5. Decrypt the payload (assuming it's encrypted with AppSKey)
+    const encryptedPayload = Buffer.from(lorawanPacket.payload, 'base64'); // Assuming payload is base64 encoded
+    const iv = Buffer.alloc(16, 0); // Initialization Vector (should be unique per message in real usage!)
+    const decipher = crypto.createDecipheriv('aes-128-ctr', Buffer.from(appSKey, 'hex'), iv);
+    let decryptedPayload = decipher.update(encryptedPayload);
+    decryptedPayload = Buffer.concat([decryptedPayload, decipher.final()]);
+
+    console.log(`Decrypted payload from DevEUI ${devEUI}:`, decryptedPayload.toString('utf8'));
+
+    // Send a response back to the gateway
+    reply.send({ message: 'Data received and processed' }); // Or send a more meaningful response
+
+    // **Important:**  In a real system, you'd:
+    //    - Store the derived session keys (NwkSKey, AppSKey) securely, associated with the DevEUI
+    //    - Use the frame counter (FCnt) to prevent replay attacks.
+    //    - Implement proper error handling.
+
+  } catch (error) {
+    console.error('Error processing message:', error);
+    reply.status(500).send({ error: 'Failed to process data' });  // Send an error response
+  }
 });
 
-mqttClient.on('error', (err) => {
-    console.error('Error en MQTT:', err);
-});
-
-// **IMPORTANTE:** Define una ruta para recibir los mensajes del gateway REALIZAR
-//METODO COMPLETO
-fastify.post('/lorawan/gateway', async (request, reply) => {
-    const gatewayData = request.body; // Los datos del gateway estarán en el cuerpo de la solicitud
-    console.log('Mensaje recibido del gateway:', gatewayData);
-
-    // **IMPORTANTE:** Implementa la lógica para procesar los mensajes del gateway
-    // Deserializar el mensaje (formato Semtech UDP o el formato que use tu gateway)
-    // Identificar el tipo de mensaje (JOIN_REQUEST, UPLINK, etc.)
-
-    // **Ejemplo Simplificado (Solo para Ilustración):**
-    // Asumiendo que el gateway envía el MHDR en un campo llamado "mhdr"
-    const mhdr = gatewayData.mhdr;
-
-    if (mhdr === '00') { // 00 indica Join Request (¡Esto es una simplificación!)
-        // Proceso de Unión OTAA
-        handleJoinRequest(gatewayData); // Pasa los datos del gateway a la función
-    } else {
-        // Proceso de Mensaje Uplink
-        handleUplinkMessage(gatewayData); // Pasa los datos del gateway a la función
-    }
-
-    reply.send({ status: 'ok' }); // Envía una respuesta al gateway
-});
-
-// Funciones para Manejar los Diferentes Tipos de Mensajes
-
-function handleJoinRequest(gatewayData) {
-    console.log('Procesando Join Request...');
-
-    // **IMPORTANTE:** Implementa la lógica para extraer DevEUI, AppEUI y DevNonce del mensaje
-    // (Esto requiere conocer el formato del Join Request de LoRaWAN)
-    // Asumiendo que el gateway envía estos datos en campos llamados "devEUI", "appEUI" y "devNonce"
-    const devEUI = gatewayData.devEUI; // Reemplaza con la lógica de extracción real
-    const appEUI = gatewayData.appEUI; // Reemplaza con la lógica de extracción real
-    const devNonce = gatewayData.devNonce; // Reemplaza con la lógica de extracción real
-
-    // Autenticación del Dispositivo
-    if (devices[devEUI] && devices[devEUI].appEUI === appEUI) {
-        console.log('Dispositivo autenticado');
-
-        // Generación de Claves de Sesión
-        const { appKey } = devices[devEUI];
-        const { nwkSKey, appSKey } = generateSessionKeys(appKey, 'appNonce', devNonce, 'netID', 'devAddr');
-
-        console.log('NwkSKey:', nwkSKey);
-        console.log('AppSKey:', appSKey);
-
-        // **IMPORTANTE:** Implementa la lógica para crear y enviar el Join Accept
-        // (Esto requiere conocer el formato del Join Accept de LoRaWAN)
-        console.log('Enviando Join Accept...');
-        // ...
-
-        // Almacena las claves de sesión para el dispositivo
-        devices[devEUI].nwkSKey = nwkSKey;
-        devices[devEUI].appSKey = appSKey;
-
-    } else {
-        console.log('Dispositivo no autenticado');
-        // **IMPORTANTE:** Implementa la lógica para rechazar la solicitud de unión
-        // ...
-    }
-}
-
-function handleUplinkMessage(gatewayData) {
-    console.log('Procesando Mensaje Uplink...');
-
-    // **IMPORTANTE:** Implementa la lógica para extraer DevEUI, datos encriptados, etc.
-    // Asumiendo que el gateway envía estos datos en campos llamados "devEUI" y "encryptedPayload"
-    const devEUI = gatewayData.devEUI; // Reemplaza con la lógica de extracción real
-    const encryptedPayload = gatewayData.encryptedPayload; // Reemplaza con la lógica de extracción real
-
-    // Desencriptación del Mensaje
-    if (devices[devEUI] && devices[devEUI].nwkSKey && devices[devEUI].appSKey) {
-        const { nwkSKey, appSKey } = devices[devEUI];
-
-        // **IMPORTANTE:** Implementa la lógica para desencriptar el payload
-        // (Esto requiere conocer el algoritmo de desencriptación de LoRaWAN)
-        const decryptedPayload = '...'; // Reemplaza con la lógica de desencriptación real
-
-        // Publicación de Datos en MQTT
-        const deviceId = devEUI;
-        const data = {
-            temperature: 25.5,
-            humidity: 60.2
-        };
-        const topic = `lorawan/devices/${deviceId}/data`;
-        mqttClient.publish(topic, JSON.stringify(data));
-
-        console.log(`Datos publicados en MQTT: ${topic}`);
-
-    } else {
-        console.log('Dispositivo no autenticado o claves de sesión no disponibles');
-        // **IMPORTANTE:** Implementa la lógica para rechazar el mensaje
-        // ...
-    }
-}
-
-// Ejecutar el servidor Fastify
+// Start the server
 const start = async () => {
-    try {
-        await fastify.listen({ port: fastifyPort });
-    } catch (err) {
-        fastify.log.error(err);
-        process.exit(1);
-    }
+  try {
+    await fastify.listen({ port: 3000 }); // Listen on port 3000 (or your preferred port)
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
 };
-
 start();
-
-console.log('Servidor LoRaWAN iniciado con Fastify');
