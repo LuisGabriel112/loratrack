@@ -97,14 +97,28 @@
             </div>
 
             <!-- Pagination -->
-            {% if nodos %}
+            {% if nodos.has_other_pages %}
             <div class="bg-gray-900 px-6 py-4 border-t border-gray-800">
                 <div class="flex items-center justify-center space-x-2">
-                    <span class="px-3 py-2 text-sm font-medium text-gray-400">1</span>
-                    <span class="px-3 py-2 text-sm text-gray-600">2</span>
-                    <span class="px-3 py-2 text-sm text-gray-600">3</span>
-                    <span class="px-3 py-2 text-sm text-gray-600">4</span>
-                    <span class="px-3 py-2 text-sm text-gray-600">5</span>
+                    {% if nodos.has_previous %}
+                        <a href="?page={{ nodos.previous_page_number }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-400">
+                            &laquo; Anterior
+                        </a>
+                    {% endif %}
+
+                    {% for i in nodos.paginator.page_range %}
+                        {% if nodos.number == i %}
+                            <span class="px-3 py-2 text-sm font-medium text-gray-400">{{ i }}</span>
+                        {% else %}
+                            <a href="?page={{ i }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-400">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if nodos.has_next %}
+                        <a href="?page={{ nodos.next_page_number }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-400">
+                            Siguiente &raquo;
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
