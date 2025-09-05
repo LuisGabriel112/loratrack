@@ -18,8 +18,8 @@ class MyDrawer {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            leading: const Icon(Icons.map),
+            title: const Text('Mapa'),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
@@ -29,8 +29,8 @@ class MyDrawer {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            leading: const Icon(Icons.campaign),
+            title: const Text('Nodos'),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
@@ -40,8 +40,8 @@ class MyDrawer {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            leading: const Icon(Icons.atm),
+            title: const Text('Historial'),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
@@ -64,8 +64,8 @@ class MapWidgetBuilder {
           mapController: mapController,
           options: const MapOptions(
             initialCenter: LatLng(0, 0),
-            initialZoom: 2,
-            minZoom: 0,
+            initialZoom: 20,
+            minZoom: 15,
             maxZoom: 100,
           ),
           children: [
@@ -84,6 +84,31 @@ class MapWidgetBuilder {
           ],
         ),
       ],
+    );
+  }
+}
+
+class CardList {
+  Widget buildTwoLineCard(String text, String content) {
+    return Card(
+      child: ListTile(
+        leading: FlutterLogo(size: 56.0),
+        title: Text(text),
+        subtitle: Text(content),
+        trailing: Icon(Icons.more_vert),
+      ),
+    );
+  }
+
+  Widget buildThreeLineCard(String text, String content) {
+    return Card(
+      child: ListTile(
+        leading: FlutterLogo(size: 72.0),
+        title: Text(text),
+        subtitle: Text(content),
+        trailing: Icon(Icons.more_vert),
+        isThreeLine: true,
+      ),
     );
   }
 }
