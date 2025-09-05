@@ -5,6 +5,7 @@ from django.contrib import messages # Para mostrar mensajes flash al usuario.
 from .models import * # Importo todos mis modelos de la app.
 import folium # La estrella del show para los mapas.
 from django.contrib.auth import logout # Para cerrar sesión del usuario.
+from django.core.paginator import Paginator # Para la paginación.
 
 # Esta vista es para mostrar la lista de todos mis dispositivos.
 def vista_dispositivos(request):
@@ -118,16 +119,23 @@ def pantalla_principal(request):
 
 # Vista para mostrar la página de nodos.
 def nodos(request):
-     # Aquí consulto todos los objetos del modelo 'nodo'.
-    todos_los_nodos = nodo.objects.all()
+    # Aquí consulto todos los objetos del modelo 'nodo'.
+    lista_nodos = nodo.objects.all()
+    # Creo un paginador para la lista de nodos, mostrando 5 nodos por página.
+    paginador = Paginator(lista_nodos, 5)
+
+    # Obtengo el número de página de la URL (si no existe, por defecto es 1).
+    numero_pagina = request.GET.get('page', 1)
+    # Obtengo la página actual del paginador.
+    pagina_actual = paginador.get_page(numero_pagina)
 
     # Preparo el contexto para pasárselo a la plantilla.
-    # En el HTML, usaré la variable 'nodos'.
+    # Ahora, en lugar de pasar todos los nodos, paso la página actual.
     contexto = {
-        'nodos': todos_los_nodos
+        'nodos': pagina_actual
     }
 
-    # Renderizo la plantilla 'nodos.html' con la lista de nodos.
+    # Renderizo la plantilla 'nodos.html' con la página de nodos.
     return render(request, 'nodos.html', contexto)
 
 def aside_bar(request):

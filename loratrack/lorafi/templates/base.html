@@ -1,24 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}LoraFi{% endblock %}</title>
-
     <!-- Google Fonts & Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=emergency_share" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
     <!-- Extra head block for child templates -->
     {% block extra_head %}{% endblock %}
     <style>
@@ -27,21 +23,18 @@
         }
     </style>
 </head>
-<body class="bg-[#E9E9E9] font-sans">
-
+<body class="bg-[#E9E9E9] font-sans h-full flex flex-col">
     <!-- Main content block with fade-in animation -->
-    <main class="animate__animated animate__fadeIn">
+    <main class="animate__animated animate__fadeIn flex-grow">
         {% block content %}
         <!-- El contenido específico de cada página irá aquí. -->
         {% endblock %}
     </main>
-
     <!-- Common footer -->
-    <footer class="bg-[#373737] w-full h-15 absolute bottom-0 flex justify-center items-center">
+    <footer class="bg-[#373737] w-full h-15 flex justify-center items-center relative">
       <img src="{% static 'img/uninlogo.png' %}" alt="Logo de unindetec" class="h-10 absolute left-5" />
-      <p class="text-white text-sm">© 2025 UNINDETEC. Todos los derechos reservados. Prohibida su reproducción total o parcial sin autorización expresa de la dependencia.</p>
+      <p class="text-white text-sm text-center px-16">© 2025 UNINDETEC. Todos los derechos reservados. Prohibida su reproducción total o parcial sin autorización expresa de la dependencia.</p>
     </footer>
-
     {% block extra_content_js %}{% endblock %}
 </body>
 </html>

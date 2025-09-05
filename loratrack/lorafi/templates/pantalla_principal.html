@@ -20,19 +20,63 @@
     </div>
 
     <!-- lista de dispositivos (oculta por defecto) -->
-    <div class="z-50 w-110 h-100 cursor-pointer absolute bg-white shadow-lg rounded-lg p-4 top-20 left-44 nav_dis_content hide">
-        <button class="volver-btn w-20 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 hover:scale-105 transition-all duration-200 mb-2">Volver</button>
-        <ul class="space-y-2">
-            {% for dispositivo in dispositivos %}
-                <li class="p-2 hover:bg-gray-100 rounded">
-                    <p class="text-blue-600 hover:underline">{{ dispositivo.nombre }}</p>
-                </li>
-            {% empty %}
-                <li class="text-gray-500">No hay dispositivos disponibles.</li>
-            {% endfor %}
-        </ul>
+<!-- lista de dispositivos (oculta por defecto) -->
+<div class="z-50 w-90 h-106 cursor-pointer absolute bg-white shadow-lg rounded-lg p-4 top-20 left-44 nav_dis_content hide flex flex-col">
+    <button class="volver-btn w-20 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 hover:scale-105 transition-all duration-200 mb-4">
+        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Volver
+    </button>
 
+    <div class="space-y-3 overflow-y-auto flex-grow">
+        {% for dispositivo in dispositivos %}
+            <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors duration-200">
+                <div class="flex items-start space-x-3">
+                    <!-- Imagen del dispositivo -->
+                    <div class="flex-shrink-0">
+                        {% if dispositivo.imagen %}
+                            <img src="{{ dispositivo.imagen.url }}" alt="{{ dispositivo.nombre }}" class="w-16 h-16 object-cover rounded-md">
+                        {% else %}
+                            <div class="w-16 h-16 bg-gray-300 rounded-md flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Información del dispositivo -->
+                    <div class="flex-grow min-w-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="text-sm font-semibold text-gray-900 truncate">{{ dispositivo.nombre }}</h3>
+                            <span class="flex items-center text-xs text-green-500 ml-2">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                Tiempo activo: 1h
+                            </span>
+                        </div>
+
+                        <p class="text-xs text-gray-500 mb-1">ID: {{ dispositivo.id }}</p>
+                        <p class="text-xs text-gray-600 mb-2">{{ dispositivo.marca|default:"Dispositivo" }}</p>
+                        <p class="text-xs text-gray-500">Última actualización: 1 seg atrás</p>
+
+                        <!-- Botón Seguir -->
+                        <button class="w-full mt-2 bg-blue-600 text-white text-xs font-semibold py-2 px-3 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                            Seguir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-8">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-gray-500 text-sm mt-2">No hay dispositivos disponibles.</p>
+            </div>
+        {% endfor %}
     </div>
+</div>
 </div>
 {% endblock %}
 
