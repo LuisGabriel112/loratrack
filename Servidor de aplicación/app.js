@@ -87,16 +87,38 @@ async function app (fastify, options) {
   })
 
   // History Route
-   fastify.get('/history', async (request, reply) => {
-    // Obtiene el historial de coordenadas del usuario desde MongoDB
-    const history = await fastify.mongo.db.collection('coordinates')
-      .find()
-      .sort({ timestamp: -1 }) // Ordena por fecha descendente
-      .limit(100) // Limita a los 100 registros más recientes
-      .toArray();
+  fastify.get('/history', async (request, reply) => {
+  try {
+    // Función para obtener y procesar datos de una colección dada
+    async function fetchData(collectionName, idField) {
+      const data = await fastify.mongo.db.collection(collectionName)
+        .find()
+        .sort({ timestamp: -1 })
+        .limit(100)
+        .toArray();
 
-    reply.send(history);
-  });
+      // Extrae solo el ID especificado, la latitud y la longitud
+      return data.map(item => ({
+        id: item[idField],
+        latitude: item.Latitud,  // Nombre del campo corregido
+        longitude: item.Longitud, // Nombre del campo corregido
+      }));
+    }
+
+    // Obtiene datos de ambas colecciones con los campos ID específicos
+    const historyGSM = await fetchData('GSM', 'IMEI');
+    const historyLORAWAN = await fetchData('LORAWAN', 'DevEUI');
+
+    // Combina los resultados en un solo array
+    const combinedHistory = [...historyGSM, ...historyLORAWAN];
+
+    // Envía los datos combinados y procesados como respuesta
+    reply.send(combinedHistory);
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+    reply.status(500).send({ error: "Error al obtener el historial de datos" });
+  }
+});
 }
 
 const start = async () => {
@@ -105,7 +127,7 @@ const start = async () => {
   })
   try {
     await fastify.register(app)
-    await fastify.listen({ port: 5500 })
+    await fastify.listen({ port: 5500, host:"192.168.100.149" })
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)

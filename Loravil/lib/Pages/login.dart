@@ -26,7 +26,8 @@ class _LogInState extends State<LogIn> {
         password = passController.text;
       });
 
-      final String serverIp = '192.168.100.149';
+      final String serverIp =
+          '192.168.100.149'; //Usar celular para entrar y checar ipconfig
       final url = Uri.parse('http://$serverIp:5500/login'); // Reemplaza
       try {
         final response = await http.post(
