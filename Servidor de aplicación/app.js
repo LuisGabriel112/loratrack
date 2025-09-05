@@ -16,13 +16,15 @@ async function dbConnector (fastify, options) {
 
 const dbPlugin = fastifyPlugin(dbConnector)
 async function app (fastify, options) {
+  const serverIp = process.env.SERVER_IP || '127.0.0.1'; // Valor por defecto si no está definida
   fastify.register(dbPlugin)
   fastify.register(websocket)
   fastify.register(cors, {
   origin: (requestOrigin, cb) => {
     const allowedOrigins = [
       'http://127.0.0.1:5500', // Django (si está en localhost)
-      'http://localhost:2400', // Flutter (si usas el navegador para Flutter web
+      'http://localhost:2400',
+       `http://${serverIp}:5500` // Flutter (si usas el navegador para Flutter web
     ];
 
     if (!requestOrigin || allowedOrigins.includes(requestOrigin)) {

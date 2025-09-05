@@ -64,8 +64,8 @@ class MapWidgetBuilder {
           mapController: mapController,
           options: const MapOptions(
             initialCenter: LatLng(0, 0),
-            initialZoom: 20,
-            minZoom: 15,
+            initialZoom: 2,
+            minZoom: 3,
             maxZoom: 100,
           ),
           children: [

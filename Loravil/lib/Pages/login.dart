@@ -26,7 +26,8 @@ class _LogInState extends State<LogIn> {
         password = passController.text;
       });
 
-      final url = Uri.parse('http://localhost:5500/login'); // Reemplaza
+      final String serverIp = '192.168.100.149';
+      final url = Uri.parse('http://$serverIp:5500/login'); // Reemplaza
       try {
         final response = await http.post(
           url,
