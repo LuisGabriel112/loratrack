@@ -8,17 +8,17 @@
 <div class="min-h-screen flex items-center justify-center">
 
     <!-- Contenedor del formulario de login -->
-    <div class="animate__animated animate__zoomIn w-250 h-130 bg-[#191919] rounded-xl relative">
-      
+    <div class="animate__animated animate__zoomIn w-250 h-130 bg-[#191919] rounded-xl relative overflow-hidden">
+
       <!-- Panel decorativo azul -->
       <div class="absolute bg-[#0D6EFF] w-70 h-130 right-0 top-0 rounded-r-xl">
         <img src="https://static.vecteezy.com/system/resources/previews/034/959/020/non_2x/abstract-black-line-contour-pattern-white-background-wallpaper-free-png.png" alt="" class="absolute z-1 h-130 w-full opacity-30 z-2">
         <h1 class="text-4xl font-bold text-white z-5 text-center mt-40 animate__animated animate__fadeInDown" style="animation-delay: 0.5s;">Lora<span class="text-[#FFF718] font-light font-mono">FI</span></h1>
         <p class="text-lg font-regular text-white z-5 mt-5 font-mono text-center animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">Monitoreo de dispositivos con cobertura amplia mediante LoRaWAN, bajo consumo energético y precisión optimizada.</p>
       </div>
-      
+
       <!-- Contenido principal del formulario -->
-      <form method="post" action="{% url 'inicio' %}" class="flex flex-col items-center z-5 w-180 h-130 pt-8">
+      <form method="post" action="{% url 'inicio' %}" class="flex flex-col items-center z-5 w-180 h-130">
           {% csrf_token %}
           <h1 class="text-4xl font-bold text-white mb-10 mt-10 text-center animate__animated animate__fadeInDown">Inicia sesion en LORAFI</h1>
 

@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navButton && navPanel) {
         navButton.addEventListener('click', () => {
             navPanel.classList.toggle('hide');
+            // Añadir o quitar las clases flex y flex-col según corresponda
+            if (navPanel.classList.contains('hide')) {
+                navPanel.classList.remove('flex', 'flex-col');
+            } else {
+                navPanel.classList.add('flex', 'flex-col');
+            }
             navButton.classList.toggle('hide');
         });
     }
@@ -14,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (backButton && navPanel) {
         backButton.addEventListener('click', () => {
             navPanel.classList.toggle('hide');
+            // Añadir o quitar las clases flex y flex-col según corresponda
+            if (navPanel.classList.contains('hide')) {
+                navPanel.classList.remove('flex', 'flex-col');
+            } else {
+                navPanel.classList.add('flex', 'flex-col');
+            }
             navButton.classList.toggle('hide');
         });
     }
