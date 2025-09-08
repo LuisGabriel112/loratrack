@@ -6,6 +6,7 @@ from .models import * # Importo todos mis modelos de la app.
 import folium # La estrella del show para los mapas.
 from django.contrib.auth import logout # Para cerrar sesión del usuario.
 from django.core.paginator import Paginator # Para la paginación.
+import random # Para generar números aleatorios.
 
 # Esta vista es para mostrar la lista de todos mis dispositivos.
 def vista_dispositivos(request):
@@ -54,17 +55,31 @@ def logout_view(request):
 
 # La vista principal de mi aplicación, donde muestro el mapa.
 def pantalla_principal(request):
-    # --- Para este ejemplo, estoy usando datos fijos ---
-    # En el futuro, la idea es tomar estas coordenadas de la base de datos.
-    # Por ahora, uso puntos en Veracruz para visualizar el mapa.
-    dispositivos_ejemplo = [
-        {'nombre': 'Dispositivo 1 (Veracruz)', 'lat': 19.1738, 'lon': -96.1342},
-        {'nombre': 'Dispositivo 2 (Veracruz)', 'lat': 19.1750, 'lon': -96.1350},
-        {'nombre': 'Dispositivo 3 (Veracruz)', 'lat': 19.1700, 'lon': -96.1300},
-    ]
+    # --- Generando datos de dispositivos con variaciones aleatorias ---
+    # Coordenadas base para la ubicación de Veracruz
+    lat_base = 19.1738
+    lon_base = -96.1342
+    # Define un rango pequeño para la variación (ej. 0.005 grados)
+    rango_variacion = 0.005
 
+    dispositivos_ejemplo = []
+    # Genera 10 dispositivos con coordenadas aleatorias alrededor de Veracruz
+    for i in range(1, 11):
+        # Calcula una variación aleatoria para latitud y longitud
+        lat_variacion = random.uniform(-rango_variacion, rango_variacion)
+        lon_variacion = random.uniform(-rango_variacion, rango_variacion)
+
+        # Crea el diccionario con las coordenadas variadas
+        dispositivo = {
+            'nombre': f'Dispositivo {i} (Veracruz)',
+            'lat': round(lat_base + lat_variacion, 4),
+            'lon': round(lon_base + lon_variacion, 4)
+        }
+        dispositivos_ejemplo.append(dispositivo)
+    # --- Fin de la generación de datos ---
+
+    # El resto del código de tu vista permanece igual
     # Creo el objeto de mapa con Folium, centrado en el primer dispositivo.
-    # Añado la atribución requerida para la capa base 'cartodbdark_matter'.
     mapa = folium.Map(
         location=[dispositivos_ejemplo[0]['lat'], dispositivos_ejemplo[0]['lon']],
         zoom_start=15,
@@ -96,8 +111,8 @@ def pantalla_principal(request):
     for disp in dispositivos_ejemplo:
         folium.Marker(
             location=[disp['lat'], disp['lon']], # Coordenadas del marcador.
-            popup=f"<i>{disp['nombre']}</i>",  # Lo que se ve al hacer clic en el marcador.
-            tooltip='Haz clic para ver más'  # El mensajito que aparece al pasar el mouse por encima.
+            popup=f"<i>{disp['nombre']}</i>",    # Lo que se ve al hacer clic en el marcador.
+            tooltip='Haz clic para ver más'       # El mensajito que aparece al pasar el mouse por encima.
         ).add_to(mapa) # Añado el marcador al mapa que creé antes.
 
     # --- Añado el control de capas al mapa ---
