@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:loravil/Pages/Login.dart';
+import 'package:loravil/Pages/nodos.dart';
+import 'package:loravil/Pages/map.dart';
 
 class MyDrawer {
   static Widget buildDrawer(BuildContext context) {
@@ -24,7 +26,9 @@ class MyDrawer {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LogIn()),
+                MaterialPageRoute(
+                  builder: (context) => const OpenstreetmapScreen(),
+                ),
               );
             },
           ),
@@ -35,7 +39,7 @@ class MyDrawer {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LogIn()),
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
               );
             },
           ),
@@ -63,8 +67,8 @@ class MapWidgetBuilder {
         FlutterMap(
           mapController: mapController,
           options: const MapOptions(
-            initialCenter: LatLng(0, 0),
-            initialZoom: 2,
+            initialCenter: LatLng(19.05800, -95.998436),
+            initialZoom: 15,
             minZoom: 3,
             maxZoom: 100,
           ),
@@ -96,18 +100,6 @@ class CardList {
         title: Text(text),
         subtitle: Text(content),
         trailing: Icon(Icons.more_vert),
-      ),
-    );
-  }
-
-  Widget buildThreeLineCard(String text, String content) {
-    return Card(
-      child: ListTile(
-        leading: FlutterLogo(size: 72.0),
-        title: Text(text),
-        subtitle: Text(content),
-        trailing: Icon(Icons.more_vert),
-        isThreeLine: true,
       ),
     );
   }
