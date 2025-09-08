@@ -1,11 +1,10 @@
+'use strict'
 const Fastify = require('fastify')
 const fastifyPlugin = require('fastify-plugin')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 const websocket = require('@fastify/websocket')
 const cors = require('@fastify/cors')
 
-const JWT_SECRET = process.env.JWT_SECRET || 'c2e0233ad3e7eb1c6ca1ba3c6773e55e1dc190f93867d2a0f671759af0d3370b' // ¡Cambia esto!
+//const JWT_SECRET = process.env.JWT_SECRET || 'c2e0233ad3e7eb1c6ca1ba3c6773e55e1dc190f93867d2a0f671759af0d3370b' // ¡Cambia esto!
 
 async function dbConnector (fastify, options) {
   fastify.register(require('@fastify/mongodb'), {
@@ -127,7 +126,7 @@ const start = async () => {
   })
   try {
     await fastify.register(app)
-    await fastify.listen({ port: 5500, host:"192.168.100.149" })
+    await fastify.listen({ port: 5500, host:"192.168.100.99" })//o 192.168.1.101
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)

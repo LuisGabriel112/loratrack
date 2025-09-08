@@ -4,6 +4,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:loravil/Pages/Login.dart';
 import 'package:loravil/Pages/nodos.dart';
+import 'package:loravil/Pages/map.dart';
 
 class MyDrawer {
   static Widget buildDrawer(BuildContext context) {
@@ -25,7 +26,9 @@ class MyDrawer {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LogIn()),
+                MaterialPageRoute(
+                  builder: (context) => const OpenstreetmapScreen(),
+                ),
               );
             },
           ),
