@@ -3,11 +3,10 @@ import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'package:loravil/Pages/map.dart';
 import 'dart:convert';
-//import 'package:shared_preferences/shared_preferences.dart';
-// Importa la pantalla OpenstreetmapScreen
+import 'package:shared_preferences/shared_preferences.dart'; // Import HistoryScreen
 
 class LogIn extends StatefulWidget {
-  const LogIn({super.key});
+  const LogIn({Key? key}) : super(key: key);
 
   @override
   State<LogIn> createState() => _LogInState();
@@ -26,9 +25,8 @@ class _LogInState extends State<LogIn> {
         password = passController.text;
       });
 
-      final String serverIp =
-          "192.168.100.99"; //'192.168.1.101'; //Usar celular para entrar y checar ipconfig
-      final url = Uri.parse('http://$serverIp:5500/login'); // Reemplaza
+      final String serverIp = "192.168.100.152";
+      final url = Uri.parse('http://$serverIp:5500/login');
       try {
         final response = await http.post(
           url,
@@ -37,17 +35,27 @@ class _LogInState extends State<LogIn> {
         );
 
         if (response.statusCode == 200) {
-          // Authentication successful, navigate to OpenstreetmapScreen
+          // Authentication successful
+          final responseData = json.decode(response.body);
+          final user = responseData['user']; // Extract user data
+          _saveLoginSession(user['Username']); // Save the username
+
           if (mounted) {
-            // Verifica si el widget está montado
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => OpenstreetmapScreen()),
             );
           }
-        } else {
+        } else if (response.statusCode == 401) {
+          // Authentication failed
           if (mounted) {
-            // Verifica si el widget está montado
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Credenciales inválidas')),
+            );
+          }
+        } else {
+          // Other server errors
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Error de autenticación')),
             );
@@ -55,14 +63,19 @@ class _LogInState extends State<LogIn> {
         }
       } catch (e) {
         if (mounted) {
-          // Verifica si el widget está montado
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Error de conexión al servidor')),
           );
         }
-        // Consider logging the exception 'e' using a proper logging mechanism
       }
     }
+  }
+
+  // Function to save the login session using SharedPreferences
+  Future<void> _saveLoginSession(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', username);
+    print('Username saved: $username');
   }
 
   @override
@@ -192,14 +205,11 @@ class _LogInState extends State<LogIn> {
                                 ),
                               ),
                               child: TextFormField(
-                                key: const Key(
-                                  'emailField',
-                                ), // Added a key for testing
+                                key: const Key('emailField'),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Por favor ingrese un usuario o EUI';
                                   }
-                                  // Add more sophisticated email/EUI validation here if needed
                                   return null;
                                 },
                                 controller: mailController,
@@ -213,15 +223,13 @@ class _LogInState extends State<LogIn> {
                             Container(
                               padding: EdgeInsets.all(8.0),
                               child: TextFormField(
-                                key: const Key(
-                                  'passwordField',
-                                ), // Added a key for testing
+                                key: const Key('passwordField'),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Por favor ingrese una contraseña';
                                   }
                                   if (value.length < 6) {
-                                    return 'La contraseña debe tener al menos 6 caracteres'; //added password length validation
+                                    return 'La contraseña debe tener al menos 6 caracteres';
                                   }
                                   return null;
                                 },
@@ -240,7 +248,6 @@ class _LogInState extends State<LogIn> {
                     ),
                     SizedBox(height: 60),
                     GestureDetector(
-                      //key: const Key('loginButton'), // Added a key for testing
                       onTap: _login,
                       child: FadeInUp(
                         duration: Duration(milliseconds: 1900),

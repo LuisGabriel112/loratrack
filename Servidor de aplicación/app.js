@@ -4,8 +4,6 @@ const fastifyPlugin = require('fastify-plugin')
 const websocket = require('@fastify/websocket')
 const cors = require('@fastify/cors')
 
-//const JWT_SECRET = process.env.JWT_SECRET || 'c2e0233ad3e7eb1c6ca1ba3c6773e55e1dc190f93867d2a0f671759af0d3370b' // ¡Cambia esto!
-
 async function dbConnector (fastify, options) {
   fastify.register(require('@fastify/mongodb'), {
     forceClose: true,
@@ -15,7 +13,7 @@ async function dbConnector (fastify, options) {
 
 const dbPlugin = fastifyPlugin(dbConnector)
 async function app (fastify, options) {
-  const serverIp = process.env.SERVER_IP || '127.0.0.1'; // Valor por defecto si no está definida
+  const serverIp = "192.168.100.152"; // Valor por defecto si no está definida
   fastify.register(dbPlugin)
   fastify.register(websocket)
   fastify.register(cors, {
@@ -46,12 +44,20 @@ async function app (fastify, options) {
     const user = await collection.findOne({ Username: Username});
 
     if (!user) {
-      reply.code(405).send({ message: 'Credenciales inválidas' });
+      reply.code(401).send({ message: 'Credenciales inválidas' }); // Use 401 for authentication failures
       return;
     }
 
-    // Authentication successful, send a success message
-    reply.send({ message: 'Inicio de sesión exitoso' });
+    // Authentication successful, record login in UsersHistorial
+    const loginRecord = {
+      Username: Username,
+      timestamp: new Date(),
+      action: 'login'
+    };
+    await fastify.mongo.db.collection('UsersHistorial').insertOne(loginRecord);
+
+    // Send user information back to the client (optional, but useful)
+    reply.send({ message: 'Inicio de sesión exitoso', user: { Username: user.Username, /* other user details */ } });
 });
 
   // WebSocket Route
@@ -85,39 +91,82 @@ async function app (fastify, options) {
     })
   })
 
-  // History Route
+// History Route
   fastify.get('/history', async (request, reply) => {
-  try {
-    // Función para obtener y procesar datos de una colección dada
-    async function fetchData(collectionName, idField) {
-      const data = await fastify.mongo.db.collection(collectionName)
-        .find()
-        .sort({ timestamp: -1 })
-        .limit(100)
-        .toArray();
+    try {
+      // Función para obtener y procesar datos de una colección dada
+      async function fetchData(collectionName, idField, type) {
+        const data = await fastify.mongo.db.collection(collectionName)
+          .find()
+          .sort({ timestamp: -1 })
+          .limit(100)
+          .toArray();
 
-      // Extrae solo el ID especificado, la latitud y la longitud
-      return data.map(item => ({
-        id: item[idField],
-        latitude: item.Latitud,  // Nombre del campo corregido
-        longitude: item.Longitud, // Nombre del campo corregido
-      }));
+        // Extrae solo el ID especificado, la latitud, la longitud y la batería
+        return data.map(item => ({
+          id: item[idField],
+          latitude: item.Latitud,  // Nombre del campo corregido
+          longitude: item.Longitud, // Nombre del campo corregido
+          bateria: item.Bateria,
+          type: type // Agrega el tipo (GSM o LORAWAN)
+        }));
+      }
+
+      // Obtiene datos de ambas colecciones con los campos ID específicos
+      const historyGSM = await fetchData('GSM', 'IMEI', 'GSM');
+      const historyLORAWAN = await fetchData('LORAWAN', 'DevEUI', 'LORAWAN');
+
+      // Combina los resultados en un solo array
+      const combinedHistory = [...historyGSM, ...historyLORAWAN];
+
+      // Envía los datos combinados y procesados como respuesta
+      reply.send(combinedHistory);
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+      reply.status(500).send({ error: "Error al obtener el historial de datos" });
     }
+  });
 
-    // Obtiene datos de ambas colecciones con los campos ID específicos
-    const historyGSM = await fetchData('GSM', 'IMEI');
-    const historyLORAWAN = await fetchData('LORAWAN', 'DevEUI');
+   // CreatedNodes Route
+  fastify.get('/createdNodes', async (request, reply) => {
+    try {
+      const createdNodes = await fastify.mongo.db.collection('CreatedNodes')
+        .find()
+        .project({ // Proyecta solo los campos deseados
+          _id: 1,
+          DevEUI: 1,
+          AppEUI: 1,
+          AppKey: 1
+        })
+        .toArray();
+      reply.send(createdNodes);
+    } catch (error) {
+      console.error("Error al obtener CreatedNodes:", error);
+      reply.status(500).send({ error: "Error al obtener CreatedNodes" });
+    }
+  });
 
-    // Combina los resultados en un solo array
-    const combinedHistory = [...historyGSM, ...historyLORAWAN];
+    // UsersHistorial Route
+  fastify.get('/usersHistorial', async (request, reply) => {
+    try {
+      const usersHistorial = await fastify.mongo.db.collection('UsersHistorial').find().toArray();
+      reply.send(usersHistorial);
+    } catch (error) {
+      console.error("Error al obtener UsersHistorial:", error);
+      reply.status(500).send({ error: "Error al obtener UsersHistorial" });
+    }
+  });
 
-    // Envía los datos combinados y procesados como respuesta
-    reply.send(combinedHistory);
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    reply.status(500).send({ error: "Error al obtener el historial de datos" });
-  }
-});
+    // CreatedUsers Route
+   fastify.get('/createdUsers', async (request, reply) => {
+    try {
+      const createdUsers = await fastify.mongo.db.collection('CreatedUsers').find().toArray();
+      reply.send(createdUsers);
+    } catch (error) {
+      console.error("Error al obtener CreatedUsers:", error);
+      reply.status(500).send({ error: "Error al obtener CreatedUsers" });
+    }
+  });
 }
 
 const start = async () => {
@@ -126,7 +175,7 @@ const start = async () => {
   })
   try {
     await fastify.register(app)
-    await fastify.listen({ port: 5500, host:"192.168.100.99" })//o 192.168.1.101
+    await fastify.listen({ port: 5500, host:"192.168.100.152" })//o 192.168.1.101
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)
