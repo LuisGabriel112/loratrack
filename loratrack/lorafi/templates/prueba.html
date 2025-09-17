@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <input type="text" id="messageInput" placeholder="Escribe un mensaje">
+    <button id="sendButton">Enviar</button>
+    <div id="messages"></div>
+
+    <script>
+        // Aquí vamos a escribir el código JavaScript
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const messagesDiv = document.getElementById('messages');
+
+        // Creamos la conexión WebSocket.
+        // Fíjate en la URL: 'ws://' en lugar de 'http://'
+        const socket = new WebSocket('ws://127.0.0.1:8000/ws/chat/');
+
+        // Evento que se dispara cuando la conexión se abre
+        socket.onopen = function(e) {
+            console.log("¡Conexión WebSocket abierta!");
+        };
+
+        // Evento que se dispara cuando el servidor nos envía un mensaje
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            messagesDiv.innerHTML += `<p>Mensaje del servidor: ${data.message}</p>`;
+        };
+
+        // Evento que se dispara cuando hay un error en la conexión
+        socket.onclose = function(e) {
+            console.error('Conexión WebSocket cerrada inesperadamente');
+        };
+
+        // Función para enviar un mensaje cuando se hace clic en el botón
+        sendButton.onclick = function(e) {
+            const message = messageInput.value;
+            socket.send(JSON.stringify({ 'message': message }));
+            messageInput.value = '';
+        };
+    </script>
+</body>
+</html>

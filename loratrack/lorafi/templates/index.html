@@ -1,42 +1,80 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-[#E9E9E9] flex justify-center items-center h-screen font-sans">
-    <!-- div general del login -->
-    <div class="animate__animated animate__fadeIn w-250 h-130 bg-[#191919] rounded-xl relative ">
-      <!-- aside azul claro  -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio de Sesión{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal para centrar el formulario en la pantalla -->
+<div class="min-h-screen flex items-center justify-center">
+
+    <!-- Contenedor del formulario de login -->
+    <div class="animate__animated animate__zoomIn w-250 h-130 bg-[#191919] rounded-xl relative overflow-hidden">
+
+      <!-- Panel decorativo azul -->
       <div class="absolute bg-[#0D6EFF] w-70 h-130 right-0 top-0 rounded-r-xl">
         <img src="https://static.vecteezy.com/system/resources/previews/034/959/020/non_2x/abstract-black-line-contour-pattern-white-background-wallpaper-free-png.png" alt="" class="absolute z-1 h-130 w-full opacity-30 z-2">
-        <h1 class="text-4xl font-bold text-white z-5 text-center mt-40">Lora<span class="text-[#FFF718] font-light font-mono">FI</span></h1>
-        <p class="text-lg font-regular text-white z-5 mt-5 font-mono text-center ">Monitoreo de dispositivos con cobertura amplia mediante LoRaWAN, bajo consumo energético y precisión optimizada.</p>
-      </div>
-      <!-- contenido principal (titulo, inputs) -->
-      <div class="flex flex-col justify-center items-center z-5 w-180 h-130">
-        <!-- titulo -->
-        <h1 class="text-4xl font-bold text-white mb-4 mt-10">Inicia sesion en LORAFI</h1>
-        <label for="usuario" class="text-white font-regular mb-2">Nombre de usuario</label>
-        <input type="text" name="usuario" id="usuario" placeholder="Tu nombre de usuario" class="text-white z-5 mb-2">
+        <h1 class="text-4xl font-bold text-white z-5 text-center mt-40 animate__animated animate__fadeInDown" style="animation-delay: 0.5s;">Lora<span class="text-[#FFF718] font-light font-mono">FI</span></h1>
+        <p class="text-lg font-regular text-white z-5 mt-5 font-mono text-center animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">Monitoreo de dispositivos con cobertura amplia mediante LoRaWAN, bajo consumo energético y precisión optimizada.</p>
       </div>
 
+      <!-- Contenido principal del formulario -->
+      <form method="post" action="{% url 'login' %}" class="flex flex-col items-center z-5 w-180 h-130">
+          {% csrf_token %}
+          <h1 class="text-4xl font-bold text-white mb-10 mt-10 text-center animate__animated animate__fadeInDown">Inicia sesion en LORAFI</h1>
+
+          {% if messages %}
+              <div class="w-140 mb-4 animate__animated animate__shakeX">
+                  {% for message in messages %}
+                      <div class="bg-red-500 text-white text-center p-2 rounded-lg">
+                          {{ message }}
+                      </div>
+                  {% endfor %}
+              </div>
+          {% endif %}
+
+          <div class="relative w-140 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <input
+              type="text"
+              name="usuario"
+              id="usuario"
+              placeholder=" "
+              class="peer text-gray-300 z-5 focus:text-white bg-transparent border-b-2 border-gray-500 w-full h-10 focus:outline-none"
+            />
+            <label
+              for="usuario"
+              class="absolute left-0 -top-4 text-xs text-gray-400 transition-all duration-300 pointer-events-none
+                peer-placeholder-shown:top-2 peer-placeholder-shown:text-base
+                peer-focus:-top-4 peer-focus:text-xs peer-focus:text-gray-300"
+            >
+              Tu nombre de usuario
+            </label>
+          </div>
+
+          <div class="relative w-140 mt-10 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+            <input
+              type="password"
+              name="contrasena"
+              id="contrasena"
+              placeholder=" "
+              class="peer text-gray-300 z-5 focus:text-white bg-transparent border-b-2 border-gray-500 w-full h-10 focus:outline-none"
+            />
+            <label
+              for="contrasena"
+              class="absolute left-0 -top-4 text-xs text-gray-400 transition-all duration-300 pointer-events-none
+                peer-placeholder-shown:top-2 peer-placeholder-shown:text-base
+                peer-focus:-top-4 peer-focus:text-xs peer-focus:text-gray-300"
+            >
+              Tu contraseña
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="w-140 h-10 bg-[#0D6EFF] text-white font-bold rounded-lg shadow-md transition-all duration-200 hover:bg-[#0056b3] hover:scale-105 focus:outline-none mt-10 animate__animated animate__fadeInUp" style="animation-delay: 0.6s;"
+          >
+            Aceptar
+          </button>
+      </form>
     </div>
-    {% load django_browser_reload %}
-    {% django_browser_reload_script %}
-  </body>
-</html>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% load static %}
+<aside class="w-28 h-screen bg-[#0D6EFF] text-white flex flex-col fixed">
+    <!-- Logo -->
+    <div class="p-4 border-b border-white text-center">
+        <a href="{% url 'mapa_tiempo_real' %}">
+            <h1 class="text-2xl font-bold">Lora<span class="text-[#FFF718] font-light font-mono">FI</span></h1>
+        </a>
+    </div>
+
+    <!-- Navegación (con justify-center en los enlaces) -->
+    <nav class="flex-grow p-4">
+        <ul>
+            <li class="mb-10">
+                <a href="{% url 'mapa_tiempo_real' %}" class="flex justify-center items-center p-2 rounded-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110">
+                    <img src="{% static 'img/loraFi.png' %}" alt="Dashboard" class="w-10">
+                </a>
+            </li>
+            <li class="mb-10">
+                <a href="{% url 'nodos' %}" class="flex justify-center items-center p-2 rounded-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110">
+                    <img src="{% static 'img/nodo.png' %}" alt="Nodos" class="w-10">
+                </a>
+            </li>
+            <li class="mb-10">
+                <a href="{% url 'dispositivos' %}" class="flex justify-center items-center p-2 rounded-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110">
+                    <img src="{% static 'img/dispositivos.png' %}" alt="Dispositivos" class="w-10">
+                </a>
+            </li>
+            <li class="mb-10">
+                <a href="{% url 'logout' %}" class="flex justify-center items-center p-2 rounded-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110">
+                    <img src="{% static 'img/logout.png' %}" alt="Cerrar Sesión" class="w-10">
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <!-- Sección de Usuario (con text-center) -->
+    <div class="p-4 border-t border-white text-center">
+        <p class="text-sm mb-2">Usuario: <span class="font-semibold">{{ user.username|default:'Invitado' }}</span></p>
+    </div>
+</aside>

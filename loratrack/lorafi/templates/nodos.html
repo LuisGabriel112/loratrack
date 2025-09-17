@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Nodos{% endblock %}
+
+{% block content %}
+<div class="flex">
+
+    {% include 'aside_bar.html' %}
+
+    <div class="flex-grow ml-28 p-8 bg-gray-50 min-h-screen">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Nodos</h1>
+            <p class="text-gray-600">En este apartado encontrarás todos los nodos registrados</p>
+        </div>
+
+        <!-- Main Content Container -->
+        <div class="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+            <!-- Table Header -->
+            <div class="bg-gray-900 border-b border-gray-700 px-6 py-4">
+                <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gray-800 rounded flex items-center justify-center mr-3">
+                            <img src="{% static 'img/nodo.png' %}" alt="Nodo" class="w-5 h-5">
+                        </div>
+                        Nombre:
+                    </div>
+                    <div>IMEI:</div>
+                    <div>Estado:</div>
+                    <div>Batería:</div>
+                    <div>Ubicación:</div>
+                </div>
+            </div>
+
+            <!-- Table Body -->
+            <div class="divide-y divide-gray-800">
+                {% for nodo in nodos %}
+                <div class="px-6 py-4 hover:bg-gray-800 transition-colors duration-200">
+                    <div class="grid grid-cols-5 gap-4 items-center">
+                        <!-- Nombre Column -->
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-{% if nodo.estado == 'activo' %}green-900{% else %}red-900{% endif %} rounded flex items-center justify-center mr-3">
+                                <img src="{% static 'img/nodo.png' %}" alt="Nodo" class="w-5 h-5">
+                            </div>
+                            <span class="font-medium text-white">Nodo {{ nodo.nombre }}</span>
+                        </div>
+
+                        <!-- IMEI Column -->
+                        <div>
+                            <span class="text-gray-400 font-mono">{{ nodo.imei }}</span>
+                        </div>
+
+
+                        <!-- Estado Column -->
+                        <div>
+                            {% if nodo.estado == 'activo' %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                    Activo
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                                    <span class="w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+                                    Inactivo
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Batería Column -->
+                        <div class="flex items-center">
+                            {% if nodo.estado == 'activo' %}
+                                <span class="material-symbols-outlined text-green-400 mr-1 text-sm"></span>
+                                <span class="text-gray-300 font-medium">{% cycle '100' '70' '50' %}%</span>
+                            {% else %}
+                                <span class="material-symbols-outlined text-gray-500 mr-1 text-sm"></span>
+                                <span class="text-gray-400 font-medium">50%</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Ubicación Column -->
+                        <div>
+                            <a href="{% url 'mapa_tiempo_real' %}?nodo_id={{ nodo.id }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors duration-200 text-center">
+                                Ubicación
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="px-6 py-12 text-center">
+                    <div class="text-gray-600 mb-4">
+                        <img src="{% static 'img/nodo.png' %}" alt="No hay nodos" class="w-16 h-16 mx-auto opacity-50">
+                    </div>
+                    <p class="text-xl text-gray-500 mb-2">No hay nodos registrados</p>
+                    <p class="text-gray-600">Los nodos aparecerán aquí una vez que sean añadidos al sistema.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if nodos.has_other_pages %}
+            <div class="bg-gray-900 px-6 py-4 border-t border-gray-800">
+                <div class="flex items-center justify-center space-x-2">
+                    {% if nodos.has_previous %}
+                        <a href="?page={{ nodos.previous_page_number }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-400">
+                            &laquo; Anterior
+                        </a>
+                    {% endif %}
+
+                    {% for i in nodos.paginator.page_range %}
+                        {% if nodos.number == i %}
+                            <span class="px-3 py-2 text-sm font-medium text-gray-400">{{ i }}</span>
+                        {% else %}
+                            <a href="?page={{ i }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-400">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if nodos.has_next %}
+                        <a href="?page={{ nodos.next_page_number }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-400">
+                            Siguiente &raquo;
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

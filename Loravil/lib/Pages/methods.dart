@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:loravil/Pages/Login.dart';
+import 'package:loravil/Pages/nodos.dart';
+import 'package:loravil/Pages/map.dart';
 
 class MyDrawer {
   static Widget buildDrawer(BuildContext context) {
@@ -18,30 +20,32 @@ class MyDrawer {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            leading: const Icon(Icons.map),
+            title: const Text('Mapa'),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LogIn()),
+                MaterialPageRoute(
+                  builder: (context) => const OpenstreetmapScreen(),
+                ),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            leading: const Icon(Icons.campaign),
+            title: const Text('Nodos'),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LogIn()),
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            leading: const Icon(Icons.atm),
+            title: const Text('Historial'),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.push(
@@ -63,9 +67,9 @@ class MapWidgetBuilder {
         FlutterMap(
           mapController: mapController,
           options: const MapOptions(
-            initialCenter: LatLng(0, 0),
-            initialZoom: 2,
-            minZoom: 0,
+            initialCenter: LatLng(19.05800, -95.998436),
+            initialZoom: 15,
+            minZoom: 3,
             maxZoom: 100,
           ),
           children: [
@@ -84,6 +88,19 @@ class MapWidgetBuilder {
           ],
         ),
       ],
+    );
+  }
+}
+
+class CardList {
+  Widget buildTwoLineCard(String text, String content) {
+    return Card(
+      child: ListTile(
+        leading: FlutterLogo(size: 56.0),
+        title: Text(text),
+        subtitle: Text(content),
+        trailing: Icon(Icons.more_vert),
+      ),
     );
   }
 }
