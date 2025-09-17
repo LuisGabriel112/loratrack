@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mapa en Tiempo Real - LoraTrack{% endblock %}
+
+{% block content %}
+<div class="flex">
+
+    <!-- Incluimos la barra lateral -->
+    {% include 'aside_bar.html' %}
+
+    <!-- Contenedor principal del mapa con margen para la barra lateral -->
+    <div class="flex-grow md:ml-28 h-screen animate__animated animate__zoomIn mt-16 md:mt-0 relative" id="map-container">
+        <!-- El mapa se insertará aquí mediante JavaScript -->
+    </div>
+
+    <!-- Botón de navegación de dispositivos -->
+    <div class="z-50 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#0D6EFF] absolute top-6 md:top-10 left-20 md:left-32 flex justify-center items-center shadow-lg hover:bg-blue-800 hover:shadow-xl hover:scale-110 transition-all duration-300 cursor-pointer nav_dis">
+        <img src="{% static 'img/nav_dis.png' %}" alt="Navegación de dispositivos" class="w-6 h-6">
+    </div>
+
+    <!-- Lista de dispositivos (oculta por defecto) -->
+    <div class="z-50 w-72 md:w-80 h-96 absolute bg-white shadow-lg rounded-lg p-3 md:p-4 top-16 md:top-20 left-4 md:left-32 nav_dis_content hide flex flex-col">
+        <button class="volver-btn w-16 md:w-20 bg-blue-600 text-white font-bold py-1 md:py-2 px-3 md:px-4 rounded-lg shadow-md hover:bg-blue-700 hover:scale-105 transition-all duration-200 mb-3 md:mb-4">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Cerrar
+        </button>
+
+        <div class="space-y-3 overflow-y-auto flex-grow" id="dispositivos-lista">
+            <!-- Los dispositivos se cargarán dinámicamente aquí -->
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<!-- Incluir Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar el mapa
+        const map = L.map('map-container').setView([19.1738, -96.1342], 15);
+
+        // Añadir capa base de OpenStreetMap
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Añadir capa de satélite
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Esri'
+        });
+
+        // Añadir capa clara de CartoDB
+        const lightLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        });
+
+        // Añadir capa oscura de CartoDB
+        const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        });
+
+        // Configurar selector de capas
+        const baseLayers = {
+            "Estándar": osmLayer,
+            "Satélite": satelliteLayer,
+            "Claro": lightLayer,
+            "Oscuro": darkLayer
+        };
+
+        L.control.layers(baseLayers).addTo(map);
+
+        // Objeto para almacenar los marcadores por ID
+        const markers = {};
+
+        // --- Lógica para seguir un nodo desde la URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const nodoIdParaSeguir = urlParams.get('nodo_id');
+        let seguimientoActivado = !!nodoIdParaSeguir; // true si el parámetro existe
+
+        // Función para actualizar o crear marcadores
+        function updateMarkers(nodos) {
+            nodos.forEach(nodo => {
+                const id = nodo.id;
+                const position = [nodo.lat, nodo.lon];
+
+                if (markers[id]) {
+                    // Si el marcador ya existe, actualizar su posición
+                    markers[id].setLatLng(position);
+                } else {
+                    // Si no existe, crear un nuevo marcador
+                    const marker = L.marker(position, {
+                        title: nodo.nombre,
+                        alt: `Nodo ${id}`,
+                        draggable: false
+                    });
+
+                    marker.bindPopup(`<strong>${nodo.nombre}</strong><br>Lat: ${nodo.lat}<br>Lon: ${nodo.lon}`);
+                    marker.addTo(map);
+                    markers[id] = marker;
+                }
+            });
+        }
+
+        // Función para actualizar la lista de dispositivos
+        function updateDeviceList(nodos) {
+            const listaContainer = document.getElementById('dispositivos-lista');
+            listaContainer.innerHTML = '';
+
+            nodos.forEach(nodo => {
+                const deviceDiv = document.createElement('div');
+                deviceDiv.className = 'bg-gray-50 rounded-lg p-2 md:p-3 hover:bg-gray-100 transition-colors duration-200';
+
+                deviceDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-300 rounded-md flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <h3 class="text-sm md:text-base font-medium text-gray-900 truncate">${nodo.nombre}</h3>
+                            <p class="text-xs md:text-sm text-gray-500">Lat: ${nodo.lat.toFixed(6)}</p>
+                            <p class="text-xs md:text-sm text-gray-500">Lon: ${nodo.lon.toFixed(6)}</p>
+                        </div>
+                        <button class="seguir-btn bg-blue-500 text-white text-xs md:text-sm py-1 px-2 md:px-3 rounded hover:bg-blue-600 transition-colors duration-200"
+                                data-id="${nodo.id}" data-lat="${nodo.lat}" data-lon="${nodo.lon}">
+                            Seguir
+                        </button>
+                    </div>
+                `;
+
+                listaContainer.appendChild(deviceDiv);
+
+                // Añadir evento al botón de seguir
+                const seguirBtn = deviceDiv.querySelector('.seguir-btn');
+                seguirBtn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const lat = parseFloat(this.getAttribute('data-lat'));
+                    const lon = parseFloat(this.getAttribute('data-lon'));
+
+                    // Centrar el mapa en el dispositivo
+                    map.setView([lat, lon], 18);
+
+                    // Abrir el popup del marcador
+                    if (markers[id]) {
+                        markers[id].openPopup();
+                    }
+                });
+            });
+        }
+
+        // Conectar al WebSocket
+        const socket = new WebSocket(`ws://${window.location.host}/ws/chat/`);
+
+        socket.onopen = function(e) {
+            console.log('Conexión WebSocket establecida');
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            if (data.type === 'location_update') {
+                // Actualizar marcadores en el mapa
+                updateMarkers(data.nodos);
+
+                // Actualizar lista de dispositivos
+                updateDeviceList(data.nodos);
+
+                // Si se pasó un ID de nodo en la URL, centrar el mapa en él la primera vez que se reciben datos
+                if (seguimientoActivado && nodoIdParaSeguir) {
+                    const nodoObjetivo = data.nodos.find(n => n.id.toString() === nodoIdParaSeguir);
+                    if (nodoObjetivo) {
+                        const lat = nodoObjetivo.lat;
+                        const lon = nodoObjetivo.lon;
+                        const id = nodoObjetivo.id;
+
+                        // Centrar el mapa en el dispositivo y hacer zoom
+                        map.setView([lat, lon], 18);
+
+                        // Abrir el popup del marcador correspondiente
+                        if (markers[id]) {
+                            markers[id].openPopup();
+                        }
+
+                        // Desactivar el seguimiento para no volver a centrar en cada actualización
+                        seguimientoActivado = false;
+                    }
+                }
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.error('Conexión WebSocket cerrada');
+        };
+
+        // Manejar la visualización de la lista de dispositivos
+        const listaDispositivos = document.querySelector('.nav_dis_content');
+        const botonNav = document.querySelector('.nav_dis');
+        const botonCerrar = document.querySelector('.volver-btn');
+
+        botonNav.addEventListener('click', function() {
+            listaDispositivos.classList.remove('hide');
+        });
+
+        botonCerrar.addEventListener('click', function() {
+            listaDispositivos.classList.add('hide');
+        });
+});
+</script>
+{% endblock %}
+{% endblock %}

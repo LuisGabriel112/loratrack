@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.apps import AppConfig
 
-def inicio(request):
-    return render(request, 'index.html')
+class LorafiConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'lorafi'
